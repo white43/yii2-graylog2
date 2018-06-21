@@ -66,6 +66,7 @@ class GraylogTarget extends Target
     {
         $transport = new Gelf\Transport\UdpTransport($this->host, $this->port, Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN);
         $publisher = new Gelf\Publisher($transport);
+        $error_class = PHP_MAJOR_VERSION >= 7 ? 'Throwable' : 'Exception';
         foreach ($this->messages as $message) {
             list($text, $level, $category, $timestamp) = $message;
             $gelfMsg = new Gelf\Message;
@@ -79,7 +80,7 @@ class GraylogTarget extends Target
             // For string log message set only shortMessage
             if (is_string($text)) {
                 $gelfMsg->setShortMessage($text);
-            } elseif ($text instanceof (PHP_MAJOR_VERSION >= 7 ? 'Throwable' : 'Exception')) {
+            } elseif ($text instanceof $error_class) {
                 /** @var $text \Throwable|\Exception */
                 $gelfMsg->setShortMessage('Exception ' . get_class($text) . ': ' . $text->getMessage());
                 $gelfMsg->setFullMessage((string) $text);
