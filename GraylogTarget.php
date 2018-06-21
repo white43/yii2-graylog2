@@ -79,7 +79,8 @@ class GraylogTarget extends Target
             // For string log message set only shortMessage
             if (is_string($text)) {
                 $gelfMsg->setShortMessage($text);
-            } elseif ($text instanceof \Exception) {
+            } elseif ($text instanceof (PHP_MAJOR_VERSION >= 7 ? 'Throwable' : 'Exception')) {
+                /** @var $text \Throwable|\Exception */
                 $gelfMsg->setShortMessage('Exception ' . get_class($text) . ': ' . $text->getMessage());
                 $gelfMsg->setFullMessage((string) $text);
                 $gelfMsg->setLine($text->getLine());
